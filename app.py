@@ -16,7 +16,7 @@ api = Api(app)
 app.secret_key = 'debroop'
 jwt = JWT(app, authenticate, identity)  #/auth
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///data.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(Items, '/items')
