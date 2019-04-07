@@ -1,10 +1,10 @@
-from app import app as application
+from app import app
 # noinspection PyUnresolvedReferences
 from db import db
 
-db.init_app(application)
+db.init_app(app)
 
 
-@application.before_first_request
+@app.before_first_request
 def create_tables():
     db.create_all()
