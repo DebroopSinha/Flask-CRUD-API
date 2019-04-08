@@ -22,7 +22,7 @@ class UserRegister(Resource):
         if UserModel.find_by_username((data['username'])):
             return {"message": "Username already in use"}, 400
         p = data['password'].encode('utf-8')
-        pw = bcrypt.hashpw(p, bcrypt.gensalt())
+        pw = bcrypt.hashpw(p, bcrypt.gensalt()).encode('utf-8')
         user = UserModel(data['username'], pw)
         user.save_to_db()
 
