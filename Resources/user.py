@@ -21,8 +21,8 @@ class UserRegister(Resource):
         data = _user_parser.parse_args()
         if UserModel.find_by_username((data['username'])):
             return {"message": "Username already in use"}, 400
-
-        pw = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
+        p = data['password'].encode('utf-8')
+        pw = bcrypt.hashpw(p, bcrypt.gensalt())
         user = UserModel(data['username'], pw)
         user.save_to_db()
 
@@ -58,7 +58,8 @@ class UserLogin(Resource):
         user = UserModel.find_by_username(data['username'])
 
         if user:
-            pw = bcrypt.hashpw(data['password'].encode('utf-8'), user.password)
+            p = data['password'].encode('utf-8')
+            pw = bcrypt.hashpw(p, user.password)
             if user.password == pw:
                 access_token = create_access_token(identity=user.id, fresh=True)
                 refresh_token = create_refresh_token(user.id)
