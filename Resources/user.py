@@ -8,8 +8,8 @@ from flask_jwt_extended import (
 )
 from flask_restful import Resource, reqparse
 from Models.user import UserModel
-import bcrypt
 from blacklist import BLACKLIST
+from passlib.hash import sha256_crypt
 
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument('username', type=str, required=True, help="field cannot be empty")
@@ -21,9 +21,9 @@ class UserRegister(Resource):
         data = _user_parser.parse_args()
         if UserModel.find_by_username((data['username'])):
             return {"message": "Username already in use"}, 400
-        p = data['password'].encode('utf-8')
-        pw = bcrypt.hashpw(p, bcrypt.gensalt()).encode('utf-8')
-        user = UserModel(data['username'], pw)
+
+        pw_hash = sha256_crypt.encrypt(data["password"])
+        user = UserModel(data['username'], pw_hash)
         user.save_to_db()
 
         return {"message": "User Created Successfully"}, 201
@@ -58,9 +58,8 @@ class UserLogin(Resource):
         user = UserModel.find_by_username(data['username'])
 
         if user:
-            p = data['password'].encode('utf-8')
-            pw = bcrypt.hashpw(p, user.password)
-            if user.password == pw:
+            if sha256_crypt.verify(data['password'], user.password):
+                print(user.password)
                 access_token = create_access_token(identity=user.id, fresh=True)
                 refresh_token = create_refresh_token(user.id)
                 return {
